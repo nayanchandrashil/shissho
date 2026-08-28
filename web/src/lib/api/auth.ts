@@ -1,56 +1,43 @@
-import { NextRequest, NextResponse } from "next/server";
-import type { AuthResponse, RegisterCredentials, StrapiErrorResponse, SessionResponse } from "@/lib/types/auth";
+import type { AuthUser, LoginCredentials, RegisterCredentials } from "@/lib/types/auth";
 
-const STRAPI_URL = process.env.STRAPI_API_URL;
-const COOKIE_NAME = "jwt";
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
-
-export async function POST(request: NextRequest) {
-  if (!STRAPI_URL) {
-    return NextResponse.json({ message: "Server misconfigured: STRAPI_API_URL missing" }, { status: 500 });
-  }
-
-  let body: RegisterCredentials;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ message: "Invalid JSON body" }, { status: 400 });
-  }
-
-  if (!body.username || !body.email || !body.password) {
-    return NextResponse.json({ message: "username, email and password are required" }, { status: 400 });
-  }
-
-  const strapiRes = await fetch(`${STRAPI_URL}/api/auth/local/register`, {
+export async function loginUser(credentials: LoginCredentials): Promise<AuthUser> {
+  const res = await fetch("/api/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      username: body.username,
-      email: body.email,
-      password: body.password,
-    }),
-    cache: "no-store",
+    body: JSON.stringify(credentials),
   });
 
-  if (!strapiRes.ok) {
-    const errData = (await strapiRes.json().catch(() => null)) as StrapiErrorResponse | null;
-    return NextResponse.json(
-      { message: errData?.error?.message ?? "Registration failed" },
-      { status: strapiRes.status },
-    );
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Login failed");
   }
 
-  const data = (await strapiRes.json()) as AuthResponse;
+  return data.user;
+}
 
-  const response = NextResponse.json<SessionResponse>({ user: data.user }, { status: 201 });
-
-  response.cookies.set(COOKIE_NAME, data.jwt, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: COOKIE_MAX_AGE,
+export async function registerUser(credentials: RegisterCredentials): Promise<AuthUser> {
+  const res = await fetch("/api/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(credentials),
   });
 
-  return response;
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || "Registration failed");
+  }
+
+  return data.user;
+}
+
+export async function logoutUser(): Promise<void> {
+  const res = await fetch("/api/auth/logout", {
+    method: "POST",
+  });
+
+  if (!res.ok) {
+    throw new Error("Logout failed");
+  }
 }

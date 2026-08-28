@@ -1,11 +1,13 @@
 export interface AuthUser {
   id: number;
+  documentId: string;
   username: string;
   email: string;
   confirmed: boolean;
   blocked: boolean;
   role?: {
     id: number;
+    documentId: string;
     name: string;
     type: string;
   };
