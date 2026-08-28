@@ -17,37 +17,35 @@ export default async (policyContext: any, config: any, { strapi }: { strapi: Cor
     return false;
   }
 
-  const targetId = policyContext.params.id;
+  const recordDocumentId = policyContext.params.id;
 
-  if (!targetId) {
+  if (!recordDocumentId) {
     return false;
   }
 
-  const type = config?.type;
+  let course;
 
-  if (type === "course") {
-    const course = await strapi.db.query("api::course.course").findOne({
-      where: { id: targetId },
+  if (config.type === "course") {
+    course = await strapi.documents("api::course.course").findOne({
+      documentId: recordDocumentId,
       populate: ["instructor"],
     });
-
-    if (!course || !course.instructor) {
-      return false;
-    }
-
-    return course.instructor.id === user.id;
-  } else if (type === "lesson") {
-    const lesson = await strapi.db.query("api::lesson.lesson").findOne({
-      where: { id: targetId },
+  } else if (config.type === "lesson") {
+    const lesson = await strapi.documents("api::lesson.lesson").findOne({
+      documentId: recordDocumentId,
       populate: { course: { populate: ["instructor"] } },
     });
 
-    if (!lesson || !lesson.course || !lesson.course.instructor) {
-      return false;
-    }
-
-    return lesson.course.instructor.id === user.id;
+    course = lesson?.course;
   }
 
-  return false;
+  if (!course || !course.instructor) {
+    return false;
+  }
+
+  const currentUser = await strapi.db.query("plugin::users-permissions.user").findOne({
+    where: { id: user.id },
+  });
+
+  return course.instructor.documentId === currentUser.documentId;
 };

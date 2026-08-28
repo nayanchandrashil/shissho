@@ -3,13 +3,17 @@ import { factories } from "@strapi/strapi";
 export default factories.createCoreController("api::course.course", ({ strapi }) => ({
   async create(ctx) {
     const user = ctx.state.user;
-    const userRole = user?.role?.name;
 
-    if (userRole === "Instructor") {
+    if (user?.role?.name === "Instructor") {
+      const currentUser = await strapi.db.query("plugin::users-permissions.user").findOne({
+        where: { id: user.id },
+      });
+
       if (!ctx.request.body.data) {
         ctx.request.body.data = {};
       }
-      ctx.request.body.data.instructor = user.id;
+
+      ctx.request.body.data.instructor = currentUser.documentId;
     }
 
     return super.create(ctx);
@@ -24,7 +28,11 @@ export default factories.createCoreController("api::course.course", ({ strapi })
     }
 
     if (userRole === "Instructor") {
-      if (ctx.request.body?.data?.instructor && ctx.request.body.data.instructor !== user.id) {
+      const currentUser = await strapi.db.query("plugin::users-permissions.user").findOne({
+        where: { id: user.id },
+      });
+
+      if (ctx.request.body?.data?.instructor && ctx.request.body.data.instructor !== currentUser.documentId) {
         return ctx.forbidden("You cannot change the ownership of this course.");
       }
     }
