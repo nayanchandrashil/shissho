@@ -65,11 +65,15 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(getDashboardUrl(userRole, request.url));
     }
 
-    if (pathname.startsWith("/content-manager") && !["admin", "content-manager"].includes(userRole)) {
+    if (pathname.startsWith("/content-manager") && userRole !== "content-manager") {
       return NextResponse.redirect(getDashboardUrl(userRole, request.url));
     }
 
-    if (pathname.startsWith("/instructor") && !["admin", "content-manager", "instructor"].includes(userRole)) {
+    if (pathname.startsWith("/instructor") && userRole !== "instructor") {
+      return NextResponse.redirect(getDashboardUrl(userRole, request.url));
+    }
+
+    if (pathname.startsWith("/dashboard") && userRole !== "student") {
       return NextResponse.redirect(getDashboardUrl(userRole, request.url));
     }
   }
