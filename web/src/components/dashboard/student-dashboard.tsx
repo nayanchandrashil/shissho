@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { enrollInCourse } from "@/lib/api/enrollments";
+import { BookMarked, Compass } from "lucide-react";
 
 export function StudentDashboard({
   allCourses,
@@ -19,7 +20,10 @@ export function StudentDashboard({
   const [activeTab, setActiveTab] = useState<"available" | "enrolled">("available");
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
-  const enrolledCourseIds = enrollments.map((e: any) => e.course?.documentId);
+  // Only keep enrollments that actually have a valid course attached —
+  // guards against orphaned/empty enrollment records showing blank cards.
+  const validEnrollments = enrollments.filter((e: any) => e.course);
+  const enrolledCourseIds = validEnrollments.map((e: any) => e.course?.documentId);
 
   const handleEnroll = async (courseId: string) => {
     setLoadingId(courseId);
@@ -38,29 +42,59 @@ export function StudentDashboard({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50 p-6 md:p-12 font-sans">
-      <div className="mx-auto max-w-6xl space-y-8">
-        <div className="bg-gradient-to-r from-violet-600 to-fuchsia-700 rounded-2xl p-8 md:p-10 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">Student Portal</h1>
-            <p className="text-violet-100 mt-2 text-lg">Explore courses, enroll, and start learning today.</p>
+    <div className="min-h-screen bg-[#FAF7EF] font-sans">
+      {/* ---------- Top banner ---------- */}
+      <div className="relative bg-[#16152E] overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-[0.06] pointer-events-none"
+          style={{
+            backgroundImage: "repeating-linear-gradient(to bottom, transparent, transparent 35px, #E3A43D 36px)",
+          }}
+        />
+        <div className="absolute -top-[40%] -right-[5%] w-[45%] h-[140%] rounded-full bg-[#2F8F7E]/15 blur-[120px] pointer-events-none" />
+
+        <div className="relative z-10 max-w-6xl mx-auto px-6 md:px-12 pt-12 pb-24">
+          <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-[#E3A43D] mb-3">
+            <Compass className="w-3.5 h-3.5" />
+            Student
           </div>
-          <div className="bg-white/10 backdrop-blur-md px-6 py-4 rounded-xl border border-white/20 text-center">
-            <p className="text-sm font-medium text-violet-100 uppercase tracking-wider mb-1">My Courses</p>
-            <p className="text-3xl font-bold">{enrollments.length}</p>
+          <h1 className="font-serif text-3xl md:text-4xl font-bold text-white tracking-tight">Student Portal</h1>
+          <p className="text-slate-400 mt-2 text-base max-w-xl">Explore courses, enroll, and start learning today.</p>
+        </div>
+      </div>
+
+      {/* Stat card floats over the banner edge, same layered pattern as Admin Dashboard */}
+      <div className="max-w-6xl mx-auto px-6 md:px-12 -mt-14 relative z-10">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+          <div className="bg-white p-6 rounded-2xl border border-black/5 shadow-[0_8px_30px_-12px_rgba(22,21,46,0.15)] flex items-center gap-4 sm:col-span-1">
+            <div className="w-12 h-12 rounded-xl bg-[#2F8F7E]/10 flex items-center justify-center shrink-0">
+              <BookMarked className="w-6 h-6 text-[#2F8F7E]" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-[#55526C] uppercase tracking-wide">My Courses</p>
+              <p className="font-serif text-2xl font-bold text-[#16152E] mt-0.5">{validEnrollments.length}</p>
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="flex gap-4 border-b border-slate-200 pb-px">
+      {/* ---------- Body ---------- */}
+      <div className="max-w-6xl mx-auto px-6 md:px-12 py-10 space-y-6">
+        {/* Pill-style tabs, same pattern as Admin Dashboard */}
+        <div className="inline-flex items-center gap-1 bg-white border border-black/5 rounded-full p-1 shadow-sm">
           <button
             onClick={() => setActiveTab("available")}
-            className={`px-6 py-3 font-semibold text-sm transition-colors border-b-2 ${activeTab === "available" ? "border-violet-600 text-violet-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}
+            className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors ${
+              activeTab === "available" ? "bg-[#16152E] text-white" : "text-[#55526C] hover:text-[#16152E]"
+            }`}
           >
             Available Courses
           </button>
           <button
             onClick={() => setActiveTab("enrolled")}
-            className={`px-6 py-3 font-semibold text-sm transition-colors border-b-2 ${activeTab === "enrolled" ? "border-violet-600 text-violet-700" : "border-transparent text-slate-500 hover:text-slate-700"}`}
+            className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors ${
+              activeTab === "enrolled" ? "bg-[#16152E] text-white" : "text-[#55526C] hover:text-[#16152E]"
+            }`}
           >
             My Learning
           </button>
@@ -73,14 +107,14 @@ export function StudentDashboard({
               return (
                 <div
                   key={course.documentId}
-                  className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col h-full hover:shadow-md transition-all"
+                  className="bg-white rounded-2xl border border-black/5 shadow-sm p-6 flex flex-col h-full min-h-[280px] hover:shadow-[0_8px_30px_-12px_rgba(22,21,46,0.15)] transition-all"
                 >
-                  <h3 className="font-bold text-xl text-slate-900 mb-2">{course.title}</h3>
-                  <p className="text-sm text-slate-500 line-clamp-3 mb-4 flex-1">{course.description}</p>
+                  <h3 className="font-serif font-bold text-xl text-[#16152E] mb-2">{course.title}</h3>
+                  <p className="text-sm text-[#55526C] line-clamp-3 mb-4 flex-1">{course.description}</p>
 
                   {course.instructor?.username && (
                     <div className="mb-6">
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 text-xs font-semibold">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#16152E]/8 text-[#16152E] text-xs font-semibold">
                         Instructor: {course.instructor.username}
                       </span>
                     </div>
@@ -89,7 +123,11 @@ export function StudentDashboard({
                   <Button
                     onClick={() => handleEnroll(course.documentId)}
                     disabled={isEnrolled || loadingId === course.documentId}
-                    className={`w-full py-6 rounded-xl font-bold transition-all ${isEnrolled ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-100 cursor-not-allowed" : "bg-violet-600 hover:bg-violet-700 text-white"}`}
+                    className={`w-full py-6 rounded-xl font-bold transition-all ${
+                      isEnrolled
+                        ? "bg-[#2F8F7E]/15 text-[#256f64] hover:bg-[#2F8F7E]/15 cursor-not-allowed"
+                        : "bg-[#E3A43D] hover:bg-[#c98f2f] text-[#16152E]"
+                    }`}
                   >
                     {isEnrolled ? "✓ Enrolled" : loadingId === course.documentId ? "Enrolling..." : "Enroll Now"}
                   </Button>
@@ -101,30 +139,34 @@ export function StudentDashboard({
 
         {activeTab === "enrolled" && (
           <div>
-            {enrollments.length === 0 ? (
-              <div className="bg-white p-12 rounded-2xl shadow-sm border border-slate-200 text-center">
-                <p className="text-slate-500 text-lg">You haven't enrolled in any courses yet.</p>
+            {validEnrollments.length === 0 ? (
+              <div className="bg-white p-12 rounded-2xl border border-black/5 shadow-sm text-center">
+                <p className="text-[#55526C] text-lg">You haven't enrolled in any courses yet.</p>
                 <Button
                   onClick={() => setActiveTab("available")}
                   variant="outline"
-                  className="mt-4 border-violet-200 text-violet-700 hover:bg-violet-50"
+                  className="mt-4 border-[#E3A43D]/40 text-[#a8781f] hover:bg-[#E3A43D]/10"
                 >
                   Browse Courses
                 </Button>
               </div>
             ) : (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {enrollments.map((enrollment: any) => (
+                {validEnrollments.map((enrollment: any) => (
                   <div
                     key={enrollment.documentId}
-                    className="bg-white rounded-2xl shadow-sm border border-emerald-200 p-6 flex flex-col h-full relative overflow-hidden"
+                    className="bg-white rounded-2xl border border-black/5 shadow-sm p-6 flex flex-col h-full min-h-[280px] hover:shadow-[0_8px_30px_-12px_rgba(22,21,46,0.15)] transition-all"
                   >
-                    <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
-                    <h3 className="font-bold text-xl text-slate-900 mb-2 mt-2">{enrollment.course?.title}</h3>
-                    <p className="text-sm text-slate-500 line-clamp-2 mb-4 flex-1">{enrollment.course?.description}</p>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-serif font-bold text-xl text-[#16152E]">{enrollment.course?.title}</h3>
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide bg-[#E3A43D]/15 text-[#a8781f] ring-1 ring-[#E3A43D]/20 shrink-0 ml-2">
+                        ✓ Enrolled
+                      </span>
+                    </div>
+                    <p className="text-sm text-[#55526C] line-clamp-2 mb-4 flex-1">{enrollment.course?.description}</p>
                     <Button
                       onClick={() => router.push(`/dashboard/course?id=${enrollment.course.documentId}`)}
-                      className="w-full bg-slate-900 hover:bg-slate-800 text-white"
+                      className="w-full py-6 rounded-xl font-bold bg-[#16152E] hover:bg-[#16152E]/90 text-white"
                     >
                       Go to Course &rarr;
                     </Button>

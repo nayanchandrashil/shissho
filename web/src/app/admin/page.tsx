@@ -17,7 +17,7 @@ export default async function AdminPage() {
   const coursesRes = await getCourses(token);
   const courses = coursesRes.data || [];
 
-  const instructors = adminData.users.filter((u: any) => u.role?.name === "Instructor" || u.role?.name === "Admin");
+  const instructors = adminData.users.filter((u: any) => u.role?.name === "Instructor");
 
   return (
     <>
