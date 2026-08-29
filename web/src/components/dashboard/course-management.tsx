@@ -113,7 +113,7 @@ export function CourseManagement({
         {
           title: lessonTitle,
           content: lessonContent,
-          videoUrl: lessonVideoUrl,
+          videourl: lessonVideoUrl || undefined,
           course: activeCourse.documentId,
         },
         token,
@@ -131,7 +131,7 @@ export function CourseManagement({
         setLessonVideoUrl("");
       }
     } catch (error) {
-      console.error("Failed to create lesson");
+      console.error("Failed to create lesson:", error);
     } finally {
       setLessonLoading(false);
     }
