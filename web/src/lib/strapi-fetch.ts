@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_API_URL;
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
 
 export async function strapiFetch(path: string, init: RequestInit = {}) {
   const cookieStore = await cookies();

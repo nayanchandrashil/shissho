@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_STRAPI_API_URL || "http://localhost:1337";
+const API_URL = process.env.NEXT_PUBLIC_STRAPI_URL || "http://localhost:1337";
 
 export async function getCourses(token: string) {
   const res = await fetch(`${API_URL}/api/courses?populate=*`, {
