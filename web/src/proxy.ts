@@ -37,7 +37,7 @@ export async function proxy(request: NextRequest) {
   let userRole = "student";
   if (jwt) {
     try {
-      const res = await fetch(`${process.env.STRAPI_API_URL}/api/users/me?populate=role`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}/api/users/me?populate=role`, {
         headers: { Authorization: `Bearer ${jwt}` },
       });
 
