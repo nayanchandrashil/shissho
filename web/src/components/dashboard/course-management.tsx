@@ -144,7 +144,7 @@ export function CourseManagement({
         {
           title: editLessonTitle,
           content: editLessonContent,
-          videoUrl: editLessonVideoUrl,
+          videourl: editLessonVideoUrl || undefined,
         },
         token,
       );
@@ -298,7 +298,7 @@ export function CourseManagement({
                                 setEditingLessonId(lesson.documentId);
                                 setEditLessonTitle(lesson.title);
                                 setEditLessonContent(lesson.content);
-                                setEditLessonVideoUrl(lesson.videoUrl || "");
+                                setEditLessonVideoUrl(lesson.videourl || lesson.videoUrl || "");
                               }}
                               variant="outline"
                               className="border-indigo-200 text-indigo-700 hover:bg-indigo-50"
@@ -318,9 +318,9 @@ export function CourseManagement({
                         <p className="text-slate-600 whitespace-pre-wrap mb-4 text-sm leading-relaxed bg-slate-50 p-4 rounded-lg">
                           {lesson.content}
                         </p>
-                        {lesson.videoUrl && (
+                        {(lesson.videourl || lesson.videoUrl) && (
                           <a
-                            href={lesson.videoUrl}
+                            href={lesson.videourl || lesson.videoUrl}
                             target="_blank"
                             rel="noreferrer"
                             className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 hover:underline"
