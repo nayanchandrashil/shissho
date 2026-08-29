@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { AuthResponse, RegisterCredentials, StrapiErrorResponse, SessionResponse } from "@/lib/types/auth";
 
-const STRAPI_URL = process.env.STRAPI_API_URL;
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
 const COOKIE_NAME = "jwt";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
 

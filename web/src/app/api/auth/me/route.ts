@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import type { AuthUser } from "@/lib/types/auth";
 
-const STRAPI_URL = process.env.STRAPI_API_URL;
+const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
 
 export async function GET() {
   if (!STRAPI_URL) {
