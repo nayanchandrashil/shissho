@@ -1,4 +1,4 @@
-const API_URL = process.env.STRAPI_API_URL || "http://localhost:1337";
+const API_URL = process.env.NEXT_PUBLIC_STRAPI_API_URL || "http://localhost:1337";
 
 export async function getAdminData(token: string) {
   const meRes = await fetch(`${API_URL}/api/users/me`, {
