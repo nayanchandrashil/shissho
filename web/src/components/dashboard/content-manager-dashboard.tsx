@@ -1,58 +1,32 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { FolderKanban, FileWarning, CheckCircle } from "lucide-react";
+"use client";
 
-export default function ContentManagerDashboard() {
+import { CourseManagement } from "./course-management";
+
+export function ContentManagerDashboard({
+  initialCourses,
+  token,
+  instructors = [],
+}: {
+  initialCourses: any[];
+  token: string;
+  instructors?: any[];
+}) {
   return (
-    <div className="p-8 space-y-6 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold tracking-tight">Content Management</h1>
+    <div className="min-h-screen bg-slate-50/50 p-6 md:p-12 font-sans">
+      <div className="mx-auto max-w-6xl space-y-6">
+        <div className="bg-gradient-to-r from-emerald-800 to-teal-900 rounded-2xl p-8 md:p-10 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">Content Workspace</h1>
+            <p className="text-emerald-100/90 mt-2 text-lg">Oversee, manage, and scale platform curriculum.</p>
+          </div>
+          <div className="bg-white/10 backdrop-blur-md px-6 py-4 rounded-xl border border-white/20">
+            <p className="text-sm font-medium text-emerald-100 uppercase tracking-wider mb-1">Total Courses</p>
+            <p className="text-3xl font-bold">{initialCourses.length}</p>
+          </div>
+        </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Platform Courses</CardTitle>
-            <FolderKanban className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">42</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Pending Reviews</CardTitle>
-            <FileWarning className="h-4 w-4 text-orange-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-500">7</div>
-            <p className="text-xs text-muted-foreground">Requires attention</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Published This Week</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-500" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-          </CardContent>
-        </Card>
+        <CourseManagement initialCourses={initialCourses} token={token} instructors={instructors} />
       </div>
-
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle>Recent Content Activity</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            List of recently created courses or flagged lessons will appear here.
-          </p>
-          <Button variant="outline" className="mt-4">
-            View Full Content List
-          </Button>
-        </CardContent>
-      </Card>
     </div>
   );
 }
